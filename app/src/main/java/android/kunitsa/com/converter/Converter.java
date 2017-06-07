@@ -21,7 +21,7 @@ public class Converter {
 
 
 
-        return wholeConvertTo(whole, r);
+        return fractionalConvertTo(fractional,r).concat(".").concat(wholeConvertTo(whole, r));
     };
 
     public String fractionalConvertTo(int fract, int r) {
@@ -36,6 +36,8 @@ public class Converter {
                 fract = fract/r;
             }
         }
+        buffer = Integer.toString(fract / r);
+        result = buffer.concat(result);
         return result;
     }
 
@@ -44,7 +46,7 @@ public class Converter {
         while (whole>1){
             whole=whole/10;
         }
-        while(whole>0){
+        for (int i=0; i<6; i++){
             if (result!=null) {
                 buffer = Double.toString(whole*r);
                 result = result.concat(buffer.substring(0, buffer.indexOf(".")));
