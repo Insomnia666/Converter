@@ -1,64 +1,113 @@
 package android.kunitsa.com.converter;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 /**
  * Created by Администратор on 07.06.2017.
  */
 
 public class Converter {
 
-    public String convertTo(String s, int r){
+    public static final BigDecimal one = new BigDecimal(1);
+    public static final BigDecimal ten = new BigDecimal(10);
 
-        int i=0, len=s.length();
+    public String anyConvertToDec(String s, int r){
 
-        int fractional = 0, whole;
-        String fractionalResult, wholeResult;
-        double limit = -Double.MAX_VALUE;
-        double multmin;
+        BigDecimal fract, whole;
 
-        fractional = Integer.parseInt(s.substring(0, s.indexOf(".")));
-        whole = Integer.parseInt(s.substring(s.indexOf(".")+1));
+        BigDecimal res = new BigDecimal(r);
 
+        fract = new BigDecimal(s.substring(0, s.indexOf(".")));
+        whole = new BigDecimal(s.substring(s.indexOf(".")+1));
 
-
-
-        return fractionalConvertTo(fractional,r).concat(".").concat(wholeConvertTo(whole, r));
+        return  decFractConvertToAny(fract, res).concat(".").concat(decWholeConvertToAny(whole, res));
     };
 
-    public String fractionalConvertTo(int fract, int r) {
+    public String decConvertToany(String s, int r){
+        BigDecimal fract, whole;
+
+        BigDecimal res = new BigDecimal(r);
+
+        fract = new BigDecimal(s.substring(0, s.indexOf(".")));
+        whole = new BigDecimal(s.substring(s.indexOf(".")+1));
+
+        return  anyFractConvertToDec(fract, res).concat(".").concat(anyWholeConvertToDec(whole, res));
+    }
+
+    public String decFractConvertToAny(BigDecimal fract, BigDecimal r){
         String result = null, buffer = null;
-        while(fract>r){
-            if (result!=null) {
-                buffer = Integer.toString(fract % r);
+        while (fract.compareTo(r) != -1){
+            if (result!=null){
+                buffer = String.valueOf(fract.remainder(r));
                 result = buffer.concat(result);
-                fract = fract / r;
+                fract = fract.divideToIntegralValue(r);
             }else {
-                result = Integer.toString(fract % r);
-                fract = fract/r;
+                result = String.valueOf(fract.remainder(r));
+                buffer = String.valueOf(fract.divideToIntegralValue(r));
+                fract = fract.divideToIntegralValue(r);
             }
         }
-        buffer = Integer.toString(fract / r);
         result = buffer.concat(result);
         return result;
     }
 
-    public String wholeConvertTo(double whole, int r) {
+    public String decWholeConvertToAny(BigDecimal whole, BigDecimal r){
         String result = null, buffer = null;
-        while (whole>1){
-            whole=whole/10;
+        while (whole.compareTo(one) != -1){
+            whole = whole.divide(ten);
         }
-        for (int i=0; i<6; i++){
+        for (int i=0; i<6; i++) {
             if (result!=null) {
-                buffer = Double.toString(whole*r);
+                buffer = String.valueOf(whole.multiply(r));
                 result = result.concat(buffer.substring(0, buffer.indexOf(".")));
-                whole = whole*r;
-                whole = whole%1;
+                whole = whole.multiply(r);
+                whole = whole.remainder(one);
             }else {
-                buffer = Double.toString(whole*r);
+                buffer = String.valueOf(whole.multiply(r));
                 result = buffer.substring(0, buffer.indexOf("."));
-                whole = whole*r;
-                whole = whole%1;
+                whole = whole.multiply(r);
+                whole = whole.remainder(one);
             }
         }
+        return result;
+    }
+
+    public String anyFractConvertToDec(BigDecimal fract, BigDecimal r) {
+        String result = null;
+        int k = 0;
+
+        BigDecimal f = fract;
+        while (f.compareTo(one) != -1){
+            k++;
+            f.divide(ten);
+        }
+        f = new BigDecimal(0);
+        for(int i=0; i<k; i++){
+            if (fract.compareTo(one) != -1){
+                f=f.add((fract.remainder(ten).multiply(r.pow(i))));
+            }
+        }
+        result = String.valueOf(f);
+        return result;
+    }
+
+    public String anyWholeConvertToDec(BigDecimal whole, BigDecimal r){
+        String result = null;
+        int k = 0;
+
+        BigDecimal w = whole;
+        while (w.compareTo(one) != -1){
+            k--;
+            w.divide(ten);
+        }
+        w = new BigDecimal(0);
+        for (int i=k; i<0; i++){
+            if (whole.compareTo(one) != -1){
+                w=w.add((whole.remainder(ten).multiply(r.pow(i))));
+            }
+        }
+        result = String.valueOf(w);
         return result;
     }
 }

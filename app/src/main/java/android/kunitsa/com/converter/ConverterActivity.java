@@ -88,7 +88,7 @@ public class ConverterActivity extends AppCompatActivity implements View.OnClick
                 display.append(".");
                 break;
             case R.id.btnResult:
-                display.setText(/*Double.toString(*/c.convertTo(display.getText().toString(), 2));
+                display.setText(c.anyConvertToDec(display.getText().toString(), 2));
                 break;
             case R.id.btnBackSpace:
                 if (display.getText().toString().length() > 0) {
